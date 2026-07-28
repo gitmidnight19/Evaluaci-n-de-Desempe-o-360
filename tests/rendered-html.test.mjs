@@ -57,6 +57,9 @@ test("renderiza la aplicación TAT 360", async () => {
 test("guarda una evaluación mediante la API", async () => {
   const rows = new Map();
   const db = {
+    async batch(statements) {
+      return Promise.all(statements.map((statement) => statement.run()));
+    },
     prepare(sql) {
       let bindings = [];
       return {

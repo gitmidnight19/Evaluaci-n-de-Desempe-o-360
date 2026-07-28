@@ -6,6 +6,29 @@ const scoreKeys = ["auto", "jefe", "pares", "clientes"] as const;
 
 type StringRecord = Record<string, string>;
 
+async function ensureEvaluationStorage() {
+  const db = getD1();
+  await db.batch([
+    db.prepare(`
+      CREATE TABLE IF NOT EXISTS evaluations (
+        id TEXT PRIMARY KEY NOT NULL,
+        employee_name TEXT NOT NULL DEFAULT '',
+        employee_id TEXT NOT NULL DEFAULT '',
+        period TEXT NOT NULL DEFAULT '',
+        payload TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
+    db.prepare(
+      "CREATE INDEX IF NOT EXISTS evaluations_employee_id_idx ON evaluations (employee_id)",
+    ),
+    db.prepare(
+      "CREATE INDEX IF NOT EXISTS evaluations_period_idx ON evaluations (period)",
+    ),
+  ]);
+}
+
 function cleanText(value: unknown, field: string, maxLength: number) {
   if (typeof value !== "string") throw new Error(`${field} debe ser texto.`);
   const cleaned = value.trim();
@@ -83,6 +106,7 @@ export async function GET(request: Request) {
   if (!id) return Response.json({ error: "Falta el identificador de la evaluación." }, { status: 400 });
 
   try {
+    await ensureEvaluationStorage();
     const row = await getD1()
       .prepare("SELECT id, payload, created_at, updated_at FROM evaluations WHERE id = ?1")
       .bind(id)
@@ -112,6 +136,7 @@ export async function POST(request: Request) {
     const evaluation = cleanEvaluation(body.evaluation);
     const payload = JSON.stringify(evaluation);
 
+    await ensureEvaluationStorage();
     await getD1()
       .prepare(`
         INSERT INTO evaluations (id, employee_name, employee_id, period, payload)
