@@ -45,6 +45,13 @@ const navItems: { id: View; label: string; short: string }[] = [
   { id: "feedback", label: "Feedback y plan", short: "05" },
 ];
 
+const portfolioOptions = [
+  "Geográfico Aire",
+  "Geográfico Tierra",
+  "Minimercado",
+  "Consumo Local",
+];
+
 function kpiRating(actual: string, target: string) {
   const a = Number(actual);
   const t = Number(target);
@@ -271,14 +278,33 @@ export default function Home() {
                 {[
                   ["name", "Nombre del colaborador", "Ej. Juan Pérez"],
                   ["id", "Documento / ID", "Identificador interno"],
-                  ["zone", "Zona / territorio", "Ej. Bogotá Sur"],
+                  ["zone", "Portafolio", "Seleccione un portafolio"],
                   ["route", "Ruta comercial", "Ej. RT-042"],
                   ["period", "Periodo evaluado", "Ej. Enero–Junio 2026"],
                   ["date", "Fecha de evaluación", "dd/mm/aaaa"],
                   ["boss", "Jefe inmediato", "Nombre del supervisor"],
                   ["tenure", "Antigüedad", "Ej. 2 años"],
                 ].map(([key, label, placeholder]) => (
-                  <label key={key}>{label}<input value={profile[key as keyof typeof profile]} placeholder={placeholder} onChange={(e) => setProfile({ ...profile, [key]: e.target.value })} /></label>
+                  <label key={key}>
+                    {label}
+                    {key === "zone" ? (
+                      <select
+                        value={profile.zone}
+                        onChange={(e) => setProfile({ ...profile, zone: e.target.value })}
+                      >
+                        <option value="">{placeholder}</option>
+                        {portfolioOptions.map((option) => (
+                          <option value={option} key={option}>{option}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={profile[key as keyof typeof profile]}
+                        placeholder={placeholder}
+                        onChange={(e) => setProfile({ ...profile, [key]: e.target.value })}
+                      />
+                    )}
+                  </label>
                 ))}
               </div>
             </section>
