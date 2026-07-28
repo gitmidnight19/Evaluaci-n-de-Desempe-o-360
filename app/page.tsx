@@ -85,19 +85,23 @@ export default function Home() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("tat360-evaluation");
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        if (data.profile) setProfile(data.profile);
-        if (data.kpis) setKpis(data.kpis);
-        if (data.scores) setScores(data.scores);
-        if (data.feedback) setFeedback(data.feedback);
-      } catch {
-        // Ignore malformed device-local data.
+    const restoreTimer = window.setTimeout(() => {
+      const saved = window.localStorage.getItem("tat360-evaluation");
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.profile) setProfile(data.profile);
+          if (data.kpis) setKpis(data.kpis);
+          if (data.scores) setScores(data.scores);
+          if (data.feedback) setFeedback(data.feedback);
+        } catch {
+          // Ignore malformed device-local data.
+        }
       }
-    }
-    setHydrated(true);
+      setHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(restoreTimer);
   }, []);
 
   useEffect(() => {

@@ -1,98 +1,240 @@
-# vinext-starter
+# TAT 360 — Evaluación de Desempeño
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Aplicación web para gestionar la evaluación de desempeño 360° de un **Asesor
+Comercial TAT** en empresas de consumo masivo y canal tradicional.
 
-## Prerequisites
+El sistema integra resultados comerciales, competencias observables, aspectos
+actitudinales, valores corporativos y retroalimentación cualitativa en una
+interfaz única con cálculo automático.
 
-- Node.js `>=22.13.0`
+## Demostración
 
-## Quick Start
+La versión alojada de la aplicación está disponible en:
+
+<https://tat360-desempeno.just-pablx.chatgpt.site>
+
+La instalación publicada es privada y puede solicitar autenticación.
+
+## Funcionalidades
+
+- Ficha de identificación del colaborador, ruta, zona y periodo.
+- Registro de siete indicadores cuantitativos TAT.
+- Conversión automática del cumplimiento de cada KPI a una nota de 1 a 5.
+- Evaluación de comportamientos por cuatro fuentes:
+  - Autoevaluación: 10%.
+  - Jefe inmediato: 40%.
+  - Pares o compañeros ruteros: 20%.
+  - Clientes o tenderos: 30%.
+- Redistribución proporcional cuando una fuente no tiene calificación.
+- Cálculo automático de aportes por bloque y resultado final sobre 100.
+- Conversión del resultado final a escala de 1 a 5.
+- Control de completitud de los 21 criterios.
+- Retroalimentación bajo el modelo:
+  - Empezar a hacer.
+  - Dejar de hacer.
+  - Continuar haciendo.
+- Registro de fortalezas, brechas y acciones de desarrollo.
+- Generación de una vista imprimible.
+- Diseño adaptable a computadores, tabletas y teléfonos.
+- Guardado automático en el almacenamiento local del navegador.
+
+## Ponderación de la evaluación
+
+| Bloque | Peso |
+|---|---:|
+| Indicadores cuantitativos — KPIs | 30% |
+| Competencias blandas y operativas | 30% |
+| Aspectos longitudinales y actitudinales | 30% |
+| Valores corporativos | 10% |
+
+La calificación final se calcula mediante:
+
+```text
+Aporte del ítem = (calificación / 5) × peso global del ítem × 100
+Resultado final = suma de los aportes de todos los ítems
+Escala equivalente 1–5 = resultado final / 20
+```
+
+El resultado definitivo se habilita cuando están registrados los siete KPIs y
+los catorce comportamientos cuentan con al menos una fuente válida.
+
+## Requisitos
+
+- [Node.js](https://nodejs.org/) versión `22.13.0` o superior.
+- npm, incluido con Node.js.
+- Git, necesario únicamente para clonar o contribuir al repositorio.
+
+Compruebe las versiones instaladas:
+
+```bash
+node --version
+npm --version
+git --version
+```
+
+## Instalación
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/gitmidnight19/Evaluaci-n-de-Desempe-o-360.git
+cd Evaluaci-n-de-Desempe-o-360
+```
+
+También puede descargar el repositorio como archivo ZIP desde GitHub y
+descomprimirlo.
+
+### 2. Instalar las dependencias
 
 ```bash
 npm install
+```
+
+### 3. Iniciar el entorno de desarrollo
+
+```bash
 npm run dev
+```
+
+Abra en el navegador la dirección mostrada por la terminal, normalmente:
+
+```text
+http://localhost:3000
+```
+
+Los comandos funcionan en **Windows, macOS y Linux** sin configuración
+adicional.
+
+## Construcción para producción
+
+Genere la versión optimizada:
+
+```bash
 npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+Inicie localmente la versión construida:
 
-## Included Shape
-
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+npm run start
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+## Validaciones disponibles
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+Ejecute la prueba de renderizado:
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```bash
+npm test
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+Revise el código con ESLint:
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+```bash
+npm run lint
+```
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+## Uso de la aplicación
 
-## Useful Commands
+1. Abra **Ficha del evaluado** y registre la información del colaborador.
+2. En **KPIs de resultados**, ingrese el resultado real y la meta de cada
+   indicador.
+3. En **Evaluación 360°**, registre las notas disponibles de autoevaluación,
+   jefe, pares y clientes.
+4. Consulte el **Tablero ejecutivo** para revisar completitud, aportes y
+   calificación final.
+5. Registre los comentarios en **Feedback y plan de desarrollo**.
+6. Utilice **Imprimir informe** para generar una versión imprimible desde el
+   navegador.
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+## Escala sugerida para los KPIs
 
-## Learn More
+| Cumplimiento frente a la meta | Nota |
+|---|---:|
+| Menos de 70% | 1 |
+| 70% a menos de 85% | 2 |
+| 85% a menos de 100% | 3 |
+| 100% a menos de 110% | 4 |
+| 110% o más | 5 |
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+## Persistencia de la información
+
+La versión actual guarda la evaluación mediante `localStorage`.
+
+- Los datos permanecen en el navegador y dispositivo donde se diligencian.
+- No se envían a una base de datos.
+- No se sincronizan entre equipos.
+- Al borrar los datos del navegador también se elimina la evaluación guardada.
+- El botón **Nueva evaluación** elimina la información después de solicitar
+  confirmación.
+
+Para un uso organizacional multiusuario se recomienda incorporar autenticación
+y una base de datos central antes de manejar información real de empleados.
+
+## Estructura principal
+
+```text
+app/
+├── globals.css       Estilos visuales y comportamiento adaptable
+├── layout.tsx        Metadatos y estructura general
+└── page.tsx          Interfaz, datos, fórmulas y navegación
+
+public/               Recursos públicos
+tests/                Pruebas de renderizado
+.openai/hosting.json  Configuración del alojamiento en OpenAI Sites
+package.json          Dependencias y comandos del proyecto
+```
+
+## Tecnologías
+
+- React 19.
+- Next.js 16.
+- TypeScript.
+- Tailwind CSS 4.
+- vinext y Vite para construcción y ejecución.
+- Cloudflare Workers como destino de despliegue.
+
+## Solución de problemas
+
+### `npm install` presenta errores
+
+Verifique que Node.js sea la versión 22.13.0 o una superior:
+
+```bash
+node --version
+```
+
+Elimine `node_modules`, conserve `package-lock.json` y vuelva a instalar:
+
+```bash
+npm install
+```
+
+### El puerto 3000 está ocupado
+
+El servidor seleccionará otro puerto disponible y lo mostrará en la terminal.
+Abra exactamente la dirección indicada.
+
+### Los datos anteriores siguen apareciendo
+
+Utilice **Nueva evaluación** dentro de la aplicación. También puede borrar los
+datos del sitio desde la configuración del navegador.
+
+### El resultado final aparece pendiente
+
+Verifique que:
+
+- Los siete KPIs tengan resultado y meta.
+- Los catorce comportamientos tengan al menos una fuente calificada.
+- Las metas sean mayores que cero.
+
+## Privacidad
+
+La evaluación de desempeño contiene información laboral confidencial. Antes de
+usar este proyecto en producción, la organización debe definir controles de
+acceso, retención de información, respaldos y tratamiento de datos personales
+de acuerdo con sus políticas y la legislación aplicable.
+
+## Estado del proyecto
+
+Versión inicial funcional. La aplicación no requiere variables de entorno,
+base de datos ni servicios externos para ejecutarse localmente.
