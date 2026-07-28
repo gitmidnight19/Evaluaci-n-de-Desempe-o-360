@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type View = "resumen" | "ficha" | "kpis" | "evaluacion" | "feedback";
@@ -152,13 +151,14 @@ export default function Home() {
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <Image
+          {/* El recurso local se carga directamente para evitar el optimizador de imágenes de vinext. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             className="brand-logo"
             src="/reddemarcassinfondo.png"
             alt="Red de marcas — ¡Lo hacemos posible!"
             width={500}
             height={500}
-            priority
           />
           <span className="brand-product">TAT 360 · Gestión del desempeño</span>
         </div>
