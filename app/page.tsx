@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type View = "resumen" | "ficha" | "kpis" | "evaluacion" | "feedback";
@@ -151,11 +152,15 @@ export default function Home() {
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark">T</div>
-          <div>
-            <strong>TAT 360</strong>
-            <span>Gestión del desempeño</span>
-          </div>
+          <Image
+            className="brand-logo"
+            src="/reddemarcassinfondo.png"
+            alt="Red de marcas — ¡Lo hacemos posible!"
+            width={500}
+            height={500}
+            priority
+          />
+          <span className="brand-product">TAT 360 · Gestión del desempeño</span>
         </div>
 
         <div className="cycle-card">
