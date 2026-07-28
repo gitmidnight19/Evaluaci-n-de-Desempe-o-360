@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type View = "resumen" | "ficha" | "kpis" | "evaluacion" | "feedback";
 type ScoreRow = { auto: string; jefe: string; pares: string; clientes: string };
+type SaveState = "idle" | "dirty" | "saving" | "saved" | "error";
 
 const sourceWeights = { auto: 0.1, jefe: 0.4, pares: 0.2, clientes: 0.3 };
 
@@ -90,6 +91,11 @@ export default function Home() {
   const [scores, setScores] = useState<ScoreRow[]>(emptyScores);
   const [feedback, setFeedback] = useState({ start: "", stop: "", continue: "", strengths: "", gaps: "", action: "" });
   const [hydrated, setHydrated] = useState(false);
+  const [evaluationId, setEvaluationId] = useState("");
+  const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [saveMessage, setSaveMessage] = useState("");
+  const [savedAt, setSavedAt] = useState("");
+  const dataVersion = useRef(0);
 
   useEffect(() => {
     const restoreTimer = window.setTimeout(() => {
@@ -101,6 +107,11 @@ export default function Home() {
           if (data.kpis) setKpis(data.kpis);
           if (data.scores) setScores(data.scores);
           if (data.feedback) setFeedback(data.feedback);
+          if (typeof data.evaluationId === "string") setEvaluationId(data.evaluationId);
+          if (typeof data.savedAt === "string") {
+            setSavedAt(data.savedAt);
+            setSaveState("saved");
+          }
         } catch {
           // Ignore malformed device-local data.
         }
@@ -113,9 +124,18 @@ export default function Home() {
 
   useEffect(() => {
     if (hydrated) {
-      window.localStorage.setItem("tat360-evaluation", JSON.stringify({ profile, kpis, scores, feedback }));
+      window.localStorage.setItem(
+        "tat360-evaluation",
+        JSON.stringify({ profile, kpis, scores, feedback, evaluationId, savedAt }),
+      );
     }
-  }, [hydrated, profile, kpis, scores, feedback]);
+  }, [hydrated, profile, kpis, scores, feedback, evaluationId, savedAt]);
+
+  const markDirty = () => {
+    dataVersion.current += 1;
+    setSaveState("dirty");
+    setSaveMessage("");
+  };
 
   const results = useMemo(() => {
     const kpiRatings = kpis.map((row) => kpiRating(row.actual, row.target));
@@ -133,11 +153,50 @@ export default function Home() {
   }, [kpis, scores]);
 
   const updateKpi = (index: number, field: "actual" | "target", value: string) => {
+    markDirty();
     setKpis((current) => current.map((row, i) => i === index ? { ...row, [field]: value } : row));
   };
 
   const updateScore = (index: number, source: keyof ScoreRow, value: string) => {
+    markDirty();
     setScores((current) => current.map((row, i) => i === index ? { ...row, [source]: value } : row));
+  };
+
+  const saveEvaluation = async () => {
+    if (saveState === "saving") return false;
+    const versionBeingSaved = dataVersion.current;
+    setSaveState("saving");
+    setSaveMessage("");
+
+    try {
+      const response = await fetch("/api/evaluations", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          id: evaluationId || undefined,
+          evaluation: { profile, kpis, scores, feedback },
+        }),
+      });
+      const result = (await response.json()) as { id?: string; updatedAt?: string; error?: string };
+      if (!response.ok || !result.id) {
+        throw new Error(result.error || "No fue posible guardar la evaluación.");
+      }
+
+      setEvaluationId(result.id);
+      setSavedAt(result.updatedAt || new Date().toISOString());
+      if (dataVersion.current === versionBeingSaved) {
+        setSaveState("saved");
+        setSaveMessage("Evaluación guardada correctamente.");
+      } else {
+        setSaveState("dirty");
+        setSaveMessage("Se guardó una versión; hay cambios nuevos pendientes.");
+      }
+      return true;
+    } catch (error) {
+      setSaveState("error");
+      setSaveMessage(error instanceof Error ? error.message : "No fue posible guardar la evaluación.");
+      return false;
+    }
   };
 
   const reset = () => {
@@ -146,6 +205,11 @@ export default function Home() {
     setKpis(kpiDefinitions.map(() => ({ actual: "", target: "" })));
     setScores(emptyScores());
     setFeedback({ start: "", stop: "", continue: "", strengths: "", gaps: "", action: "" });
+    setEvaluationId("");
+    setSavedAt("");
+    setSaveState("dirty");
+    setSaveMessage("");
+    dataVersion.current += 1;
     setView("resumen");
   };
 
@@ -185,9 +249,15 @@ export default function Home() {
           ))}
         </nav>
 
-        <div className="sidebar-note">
+        <div className={`sidebar-note save-${saveState}`} aria-live="polite">
           <span className="status-dot" />
-          Guardado automático en este dispositivo
+          {saveState === "saving"
+            ? "Guardando evaluación…"
+            : saveState === "saved"
+              ? "Evaluación guardada"
+              : saveState === "error"
+                ? "Error al guardar"
+                : "Cambios pendientes de guardar"}
         </div>
       </aside>
 
@@ -199,9 +269,18 @@ export default function Home() {
           </div>
           <div className="top-actions">
             <button className="button ghost" onClick={reset}>Nueva evaluación</button>
+            <button className="button primary" onClick={saveEvaluation} disabled={saveState === "saving"}>
+              {saveState === "saving" ? "Guardando…" : "Guardar evaluación"}
+            </button>
             <button className="button primary" onClick={() => window.print()}>Imprimir informe</button>
           </div>
         </header>
+
+        {saveMessage && (
+          <div className={`save-notice ${saveState}`} role={saveState === "error" ? "alert" : "status"}>
+            {saveMessage}
+          </div>
+        )}
 
         {view === "resumen" && (
           <div className="page-content">
@@ -290,7 +369,10 @@ export default function Home() {
                     {key === "zone" ? (
                       <select
                         value={profile.zone}
-                        onChange={(e) => setProfile({ ...profile, zone: e.target.value })}
+                        onChange={(e) => {
+                          markDirty();
+                          setProfile({ ...profile, zone: e.target.value });
+                        }}
                       >
                         <option value="">{placeholder}</option>
                         {portfolioOptions.map((option) => (
@@ -301,7 +383,10 @@ export default function Home() {
                       <input
                         value={profile[key as keyof typeof profile]}
                         placeholder={placeholder}
-                        onChange={(e) => setProfile({ ...profile, [key]: e.target.value })}
+                        onChange={(e) => {
+                          markDirty();
+                          setProfile({ ...profile, [key]: e.target.value });
+                        }}
                       />
                     )}
                   </label>
@@ -309,7 +394,7 @@ export default function Home() {
               </div>
             </section>
             <InfoBanner title="Criterio de aplicación">Defina metas y evaluadores antes de iniciar. La selección recomendada es: 1 jefe, mínimo 2 pares y entre 3 y 5 tenderos representativos.</InfoBanner>
-            <FooterActions onNext={goNext} />
+            <FooterActions onSaveAndNext={async () => { if (await saveEvaluation()) goNext(); }} saveState={saveState} />
           </div>
         )}
 
@@ -336,7 +421,7 @@ export default function Home() {
               </div>
             </section>
             <InfoBanner title="Escala automática">Menos de 70% = 1 · 70–84,9% = 2 · 85–99,9% = 3 · 100–109,9% = 4 · 110% o más = 5.</InfoBanner>
-            <FooterActions onNext={goNext} />
+            <FooterActions onSaveAndNext={async () => { if (await saveEvaluation()) goNext(); }} saveState={saveState} />
           </div>
         )}
 
@@ -369,7 +454,7 @@ export default function Home() {
               </section>
             ))}
             <InfoBanner title="Regla de evidencia">Las notas 1 y 5 deben acompañarse de un ejemplo verificable durante la conversación de retroalimentación.</InfoBanner>
-            <FooterActions onNext={goNext} />
+            <FooterActions onSaveAndNext={async () => { if (await saveEvaluation()) goNext(); }} saveState={saveState} />
           </div>
         )}
 
@@ -384,16 +469,28 @@ export default function Home() {
               ].map(([key, title, prompt, color]) => (
                 <label className={`feedback-card ${color}`} key={key}>
                   <span>{title}</span><small>{prompt}</small>
-                  <textarea value={feedback[key as keyof typeof feedback]} onChange={(e) => setFeedback({ ...feedback, [key]: e.target.value })} placeholder="Registre un ejemplo concreto..." />
+                  <textarea value={feedback[key as keyof typeof feedback]} onChange={(e) => {
+                    markDirty();
+                    setFeedback({ ...feedback, [key]: e.target.value });
+                  }} placeholder="Registre un ejemplo concreto..." />
                 </label>
               ))}
             </div>
             <section className="panel form-panel">
               <div className="panel-heading compact"><div><span className="eyebrow">Síntesis gerencial</span><h3>Plan de desarrollo</h3></div></div>
               <div className="form-grid">
-                <label>Fortalezas prioritarias<textarea value={feedback.strengths} onChange={(e) => setFeedback({ ...feedback, strengths: e.target.value })} /></label>
-                <label>Brechas prioritarias<textarea value={feedback.gaps} onChange={(e) => setFeedback({ ...feedback, gaps: e.target.value })} /></label>
-                <label className="full">Acción, responsable, fecha e indicador de éxito<textarea value={feedback.action} onChange={(e) => setFeedback({ ...feedback, action: e.target.value })} /></label>
+                <label>Fortalezas prioritarias<textarea value={feedback.strengths} onChange={(e) => {
+                  markDirty();
+                  setFeedback({ ...feedback, strengths: e.target.value });
+                }} /></label>
+                <label>Brechas prioritarias<textarea value={feedback.gaps} onChange={(e) => {
+                  markDirty();
+                  setFeedback({ ...feedback, gaps: e.target.value });
+                }} /></label>
+                <label className="full">Acción, responsable, fecha e indicador de éxito<textarea value={feedback.action} onChange={(e) => {
+                  markDirty();
+                  setFeedback({ ...feedback, action: e.target.value });
+                }} /></label>
               </div>
             </section>
             <section className="completion-card">
@@ -419,6 +516,19 @@ function InfoBanner({ title, children }: { title: string; children: React.ReactN
   return <aside className="info-banner"><strong>{title}</strong><p>{children}</p></aside>;
 }
 
-function FooterActions({ onNext }: { onNext: () => void }) {
-  return <div className="footer-actions"><span>Los cambios se guardan automáticamente.</span><button className="button primary" onClick={onNext}>Guardar y continuar →</button></div>;
+function FooterActions({
+  onSaveAndNext,
+  saveState,
+}: {
+  onSaveAndNext: () => Promise<void>;
+  saveState: SaveState;
+}) {
+  return (
+    <div className="footer-actions">
+      <span>El borrador se conserva en este dispositivo hasta guardarlo.</span>
+      <button className="button primary" onClick={onSaveAndNext} disabled={saveState === "saving"}>
+        {saveState === "saving" ? "Guardando…" : "Guardar y continuar →"}
+      </button>
+    </div>
+  );
 }

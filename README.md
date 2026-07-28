@@ -36,7 +36,8 @@ La instalación publicada es privada y puede solicitar autenticación.
 - Registro de fortalezas, brechas y acciones de desarrollo.
 - Generación de una vista imprimible.
 - Diseño adaptable a computadores, tabletas y teléfonos.
-- Guardado automático en el almacenamiento local del navegador.
+- Guardado de evaluaciones en una base de datos central.
+- Respaldo automático del borrador en el almacenamiento local del navegador.
 
 ## Ponderación de la evaluación
 
@@ -158,17 +159,14 @@ npm run lint
 
 ## Persistencia de la información
 
-La versión actual guarda la evaluación mediante `localStorage`.
+El botón **Guardar evaluación** crea el registro en Cloudflare D1. Las
+modificaciones posteriores actualizan el mismo registro, evitando duplicados.
+La interfaz informa si la evaluación está guardada, tiene cambios pendientes o
+si ocurrió un error.
 
-- Los datos permanecen en el navegador y dispositivo donde se diligencian.
-- No se envían a una base de datos.
-- No se sincronizan entre equipos.
-- Al borrar los datos del navegador también se elimina la evaluación guardada.
-- El botón **Nueva evaluación** elimina la información después de solicitar
-  confirmación.
-
-Para un uso organizacional multiusuario se recomienda incorporar autenticación
-y una base de datos central antes de manejar información real de empleados.
+Mientras se diligencia, también se conserva un borrador en `localStorage` para
+proteger el trabajo ante cierres o fallos de conexión. El botón **Nueva
+evaluación** inicia un registro diferente después de solicitar confirmación.
 
 ## Estructura principal
 
