@@ -50,6 +50,7 @@ test("renderiza la aplicación TAT 360", async () => {
   assert.match(html, /KPIs de resultados/i);
   assert.match(html, /Feedback y plan/i);
   assert.match(html, /Guardar evaluación/i);
+  assert.match(html, /Descargar resultado/i);
   assert.doesNotMatch(html, /codex-preview/i);
   assert.doesNotMatch(html, /Your site is taking shape/i);
 });

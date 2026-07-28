@@ -122,15 +122,6 @@ export default function Home() {
     return () => window.clearTimeout(restoreTimer);
   }, []);
 
-  useEffect(() => {
-    if (hydrated) {
-      window.localStorage.setItem(
-        "tat360-evaluation",
-        JSON.stringify({ profile, kpis, scores, feedback, evaluationId, savedAt }),
-      );
-    }
-  }, [hydrated, profile, kpis, scores, feedback, evaluationId, savedAt]);
-
   const markDirty = () => {
     dataVersion.current += 1;
     setSaveState("dirty");
@@ -151,6 +142,60 @@ export default function Home() {
     const total = kpiPoints + competencePoints + attitudePoints + valuePoints;
     return { kpiRatings, behaviorScores, kpiPoints, competencePoints, attitudePoints, valuePoints, kpiDone, behaviorDone, completeness, complete, total };
   }, [kpis, scores]);
+
+  const localOutput = useMemo(() => ({
+    formatVersion: 1,
+    evaluationId: evaluationId || null,
+    generatedAt: new Date().toISOString(),
+    profile,
+    summary: {
+      complete: results.complete,
+      completeness: results.completeness,
+      score100: results.complete ? Number(results.total.toFixed(2)) : null,
+      score5: results.complete ? Number((results.total / 20).toFixed(2)) : null,
+      category: results.complete ? category(results.total) : "Pendiente",
+      completedKpis: results.kpiDone,
+      completedBehaviors: results.behaviorDone,
+    },
+    blocks: {
+      kpis: { points: Number(results.kpiPoints.toFixed(2)), maximum: 30 },
+      competencies: { points: Number(results.competencePoints.toFixed(2)), maximum: 30 },
+      attitudes: { points: Number(results.attitudePoints.toFixed(2)), maximum: 30 },
+      values: { points: Number(results.valuePoints.toFixed(2)), maximum: 10 },
+    },
+    kpis: kpiDefinitions.map((definition, index) => ({
+      code: definition.code,
+      name: definition.name,
+      weight: definition.weight,
+      actual: kpis[index].actual || null,
+      target: kpis[index].target || null,
+      compliance:
+        kpis[index].actual !== "" && Number(kpis[index].target) > 0
+          ? Number((Number(kpis[index].actual) / Number(kpis[index].target)).toFixed(4))
+          : null,
+      rating: results.kpiRatings[index] || null,
+    })),
+    behaviors: behaviorDefinitions.map((definition, index) => ({
+      block: definition.block,
+      code: definition.code,
+      name: definition.name,
+      weight: definition.weight,
+      sources: scores[index],
+      weightedScore: results.behaviorScores[index]
+        ? Number(results.behaviorScores[index].toFixed(2))
+        : null,
+    })),
+    feedback,
+  }), [evaluationId, feedback, kpis, profile, results, scores]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(
+      "tat360-evaluation",
+      JSON.stringify({ profile, kpis, scores, feedback, evaluationId, savedAt }),
+    );
+    window.localStorage.setItem("tat360-evaluation-output", JSON.stringify(localOutput));
+  }, [hydrated, profile, kpis, scores, feedback, evaluationId, savedAt, localOutput]);
 
   const updateKpi = (index: number, field: "actual" | "target", value: string) => {
     markDirty();
@@ -197,6 +242,29 @@ export default function Home() {
       setSaveMessage(error instanceof Error ? error.message : "No fue posible guardar la evaluación.");
       return false;
     }
+  };
+
+  const downloadLocalOutput = () => {
+    const fileContent = JSON.stringify(
+      { ...localOutput, exportedAt: new Date().toISOString() },
+      null,
+      2,
+    );
+    const blob = new Blob([fileContent], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const safeName = (profile.name || profile.id || "evaluacion")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9_-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase();
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `resultado-tat360-${safeName || "evaluacion"}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   const reset = () => {
@@ -272,6 +340,7 @@ export default function Home() {
             <button className="button primary" onClick={saveEvaluation} disabled={saveState === "saving"}>
               {saveState === "saving" ? "Guardando…" : "Guardar evaluación"}
             </button>
+            <button className="button ghost" onClick={downloadLocalOutput}>Descargar resultado</button>
             <button className="button primary" onClick={() => window.print()}>Imprimir informe</button>
           </div>
         </header>
