@@ -713,13 +713,41 @@ export default function Home() {
                 }} /></label>
               </div>
             </section>
-            <section className="completion-card">
-              <div>
-                <span className="eyebrow">Estado del proceso</span>
-                <h3>{results.complete ? "Evaluación lista para cierre" : `Evaluación al ${results.completeness}%`}</h3>
-                <p>{results.complete ? `Resultado final: ${results.total.toFixed(1)}/100 · ${category(results.total)}` : "Complete los criterios faltantes antes de emitir la calificación definitiva."}</p>
+            <section className={`completion-card ${results.complete ? "complete" : "pending"}`}>
+              <div className="completion-card-heading">
+                <div>
+                  <span className="eyebrow">Estado del proceso</span>
+                  <h3>{results.complete ? "Evaluación lista para cierre" : `Evaluación al ${results.completeness}%`}</h3>
+                  <p>{results.complete ? "Resumen consolidado de la evaluación de desempeño 360°." : "Complete los criterios faltantes antes de emitir la calificación definitiva."}</p>
+                </div>
+                <span className="completion-status">{results.complete ? "Lista para cierre" : "En proceso"}</span>
               </div>
-              <button className="button dark" onClick={downloadPdfOutput}>Descargar informe PDF</button>
+              <div className="completion-summary">
+                <div className="completion-main-score">
+                  <span>Resultado final</span>
+                  <strong>{results.total.toFixed(1)}<small>/100</small></strong>
+                  <em>{results.complete ? category(results.total) : "Resultado parcial"}</em>
+                </div>
+                <div>
+                  <span>KPIs de resultados</span>
+                  <strong>{results.kpiPoints.toFixed(1)}<small>/30</small></strong>
+                </div>
+                <div>
+                  <span>Comportamientos 360°</span>
+                  <strong>{(results.competencePoints + results.attitudePoints + results.valuePoints).toFixed(1)}<small>/70</small></strong>
+                </div>
+                <div>
+                  <span>Completitud</span>
+                  <strong>{results.completeness}<small>%</small></strong>
+                </div>
+              </div>
+              <div className="completion-card-footer">
+                <div>
+                  <span><i style={{ width: `${results.completeness}%` }} /></span>
+                  <small>{results.kpiDone + results.behaviorDone} de 21 criterios diligenciados</small>
+                </div>
+                <button className="button completion-download" onClick={downloadPdfOutput}>Descargar informe PDF</button>
+              </div>
             </section>
           </div>
         )}
