@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createEvaluationPdf } from "@/lib/evaluation-pdf";
 
 type View = "resumen" | "ficha" | "kpis" | "evaluacion" | "feedback";
 type ScoreRow = { auto: string; jefe: string; pares: string; clientes: string };
@@ -244,27 +245,17 @@ export default function Home() {
     }
   };
 
-  const downloadLocalOutput = () => {
-    const fileContent = JSON.stringify(
-      { ...localOutput, exportedAt: new Date().toISOString() },
-      null,
-      2,
-    );
-    const blob = new Blob([fileContent], { type: "application/json;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+  const downloadPdfOutput = async () => {
     const safeName = (profile.name || profile.id || "evaluacion")
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-zA-Z0-9_-]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .toLowerCase();
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `resultado-tat360-${safeName || "evaluacion"}.json`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    const pdf = await createEvaluationPdf(localOutput);
+    pdf.save(
+      `informe-tat360-${safeName || "evaluacion"}.pdf`,
+    );
   };
 
   const reset = () => {
@@ -340,7 +331,7 @@ export default function Home() {
             <button className="button primary" onClick={saveEvaluation} disabled={saveState === "saving"}>
               {saveState === "saving" ? "Guardando…" : "Guardar evaluación"}
             </button>
-            <button className="button ghost" onClick={downloadLocalOutput}>Descargar resultado</button>
+            <button className="button ghost" onClick={downloadPdfOutput}>Descargar PDF</button>
             <button className="button primary" onClick={() => window.print()}>Imprimir informe</button>
           </div>
         </header>
@@ -568,7 +559,7 @@ export default function Home() {
                 <h3>{results.complete ? "Evaluación lista para cierre" : `Evaluación al ${results.completeness}%`}</h3>
                 <p>{results.complete ? `Resultado final: ${results.total.toFixed(1)}/100 · ${category(results.total)}` : "Complete los criterios faltantes antes de emitir la calificación definitiva."}</p>
               </div>
-              <button className="button dark" onClick={() => window.print()}>Generar informe imprimible</button>
+              <button className="button dark" onClick={downloadPdfOutput}>Descargar informe PDF</button>
             </section>
           </div>
         )}

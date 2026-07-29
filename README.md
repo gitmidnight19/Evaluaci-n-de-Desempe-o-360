@@ -38,7 +38,7 @@ La instalación publicada es privada y puede solicitar autenticación.
 - Diseño adaptable a computadores, tabletas y teléfonos.
 - Guardado de evaluaciones en una base de datos central.
 - Respaldo automático del borrador en el almacenamiento local del navegador.
-- Descarga local del resultado completo en formato JSON.
+- Descarga local del informe completo en formato PDF.
 
 ## Ponderación de la evaluación
 
@@ -169,10 +169,11 @@ Mientras se diligencia, también se conserva un borrador en `localStorage` para
 proteger el trabajo ante cierres o fallos de conexión. El botón **Nueva
 evaluación** inicia un registro diferente después de solicitar confirmación.
 
-El botón **Descargar resultado** genera un archivo JSON local con la ficha,
-puntajes por bloque, calificación final, detalle de KPIs y comportamientos,
-feedback y estado de completitud. La última salida calculada también queda
-disponible en `localStorage` bajo la clave `tat360-evaluation-output`.
+El botón **Descargar PDF** genera un informe local con formato corporativo,
+resumen ejecutivo, puntajes por bloque, calificación final, detalle de KPIs y
+comportamientos, feedback, pie de página y numeración. La última salida
+calculada también queda disponible en `localStorage` bajo la clave
+`tat360-evaluation-output`.
 
 ## Estructura principal
 
