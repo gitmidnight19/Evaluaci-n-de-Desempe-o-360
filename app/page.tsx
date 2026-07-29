@@ -372,7 +372,6 @@ export default function Home() {
           <div className="page-content">
             <section className="hero">
               <div>
-                <span className="pill">Canal tradicional · Consumo masivo</span>
                 <h2>{profile.name ? `Desempeño de ${profile.name}` : "Una lectura integral del desempeño en calle"}</h2>
                 <p>Resultados comerciales, ejecución TAT, adaptación operativa y valores corporativos en una sola vista.</p>
               </div>
