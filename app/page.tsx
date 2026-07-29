@@ -75,6 +75,15 @@ function kpiStatus(rating: number) {
   return "Pendiente";
 }
 
+function behaviorStatus(rating: number) {
+  if (rating === 1) return "Crítico";
+  if (rating === 2) return "En desarrollo";
+  if (rating === 3) return "Esperado";
+  if (rating === 4) return "Destacado";
+  if (rating === 5) return "Sobresaliente";
+  return "Pendiente";
+}
+
 function weightedScore(row: ScoreRow) {
   const entries = (Object.keys(sourceWeights) as (keyof ScoreRow)[])
     .filter((key) => row[key] !== "")
@@ -615,8 +624,13 @@ export default function Home() {
                 </div>
                 <div className="data-table behavior-table">
                   <div className="table-head"><span>Comportamiento</span><span>Auto</span><span>Jefe</span><span>Pares</span><span>Clientes</span><span>Prom.</span></div>
-                  {behaviorDefinitions.map((item, index) => item.block === block && (
-                    <div className="table-row" key={item.code}>
+                  {behaviorDefinitions.map((item, index) => {
+                    if (item.block !== block) return null;
+                    const behaviorScore = results.behaviorScores[index];
+                    const behaviorTone = behaviorScore ? Math.round(behaviorScore) : 0;
+                    const status = behaviorStatus(behaviorTone);
+                    return (
+                    <div className={`table-row behavior-tone-${behaviorTone}`} key={item.code}>
                       <div><b>{item.code}</b><strong>{item.name}</strong><small>{item.behavior}</small></div>
                       {(["auto", "jefe", "pares", "clientes"] as (keyof ScoreRow)[]).map((source) => {
                         const score = scores[index][source];
@@ -650,9 +664,14 @@ export default function Home() {
                           </div>
                         );
                       })}
-                      <span className="weighted-result">{results.behaviorScores[index] ? results.behaviorScores[index].toFixed(2) : "—"}</span>
+                      <div className={`weighted-result result-${behaviorTone}`} aria-label={`Promedio ${behaviorScore ? behaviorScore.toFixed(2) : "pendiente"}, ${status}`}>
+                        <strong>{behaviorScore ? behaviorScore.toFixed(2) : "—"}</strong>
+                        <i><i style={{ width: `${(behaviorScore / 5) * 100}%` }} /></i>
+                        <small>{status}</small>
+                      </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             ))}
