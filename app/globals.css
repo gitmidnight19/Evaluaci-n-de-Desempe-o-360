@@ -26,7 +26,7 @@ button { cursor: pointer; }
 .sidebar::-webkit-scrollbar { width: 5px; }.sidebar::-webkit-scrollbar-thumb { border-radius: 10px; background: rgba(255,255,255,.18); }
 .brand { display: flex; flex-direction: column; align-items: flex-start; padding: 2px 8px 16px; border-bottom: 1px solid rgba(255,255,255,.09); }
 .brand-logo { width: 142px; height: auto; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,.16)); }
-.cycle-card { margin: 16px 0 18px; padding: 14px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.055); }
+.cycle-card { margin: 16px 0 18px; padding: 14px; border: 1px solid #7d2a38; border-radius: 13px; background: #651b28; box-shadow: 0 9px 20px rgba(17,3,6,.2); }
 .cycle-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .cycle-card-head > span { display: inline-flex; align-items: center; gap: 6px; color: #cba7ad; font-size: 7px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
 .cycle-card-head > span i { width: 6px; height: 6px; border-radius: 50%; background: #64d7a1; box-shadow: 0 0 0 3px rgba(100,215,161,.11); }
