@@ -342,22 +342,16 @@ export default function Home() {
             <strong>{results.completeness}%</strong>
           </div>
           <p>{profile.period || "Periodo sin definir"}</p>
-          <div className="cycle-progress-label">
-            <span>Avance de evaluación</span>
-            <small>{results.completeness}% completado</small>
-          </div>
           <div className="progress-track" role="progressbar" aria-label="Progreso del ciclo" aria-valuemin={0} aria-valuemax={100} aria-valuenow={results.completeness}>
             <span style={{ width: `${results.completeness}%` }} />
           </div>
-          <div className="cycle-card-status">
-            <i>{results.completeness === 100 ? "✓" : "↗"}</i>
-            <div>
-              <strong>{results.completeness === 100 ? "Evaluación completa" : "Evaluación en curso"}</strong>
-              <small>{results.completeness === 100 ? "Todos los bloques diligenciados" : `${21 - results.kpiDone - results.behaviorDone} registros pendientes`}</small>
-            </div>
+          <div className="cycle-card-footer">
+            <span>{results.completeness === 100 ? "Ciclo completado" : `${results.kpiDone + results.behaviorDone} de 21 registros`}</span>
+            <small>{results.completeness === 100 ? "✓" : `${21 - results.kpiDone - results.behaviorDone} pendientes`}</small>
           </div>
         </div>
 
+        <span className="nav-label">Navegación</span>
         <nav aria-label="Secciones de la evaluación">
           {navItems.map((item) => (
             <button key={item.id} className={view === item.id ? "nav-item active" : "nav-item"} onClick={() => setView(item.id)}>
