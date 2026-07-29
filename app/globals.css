@@ -208,12 +208,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
 .score-stepper.score-3 { border-color: #a9c3da; background: #f2f7fb; }.score-stepper.score-3 input { color: #35658f; }
 .score-stepper.score-4 { border-color: #90c9c3; background: #eff9f7; }.score-stepper.score-4 input { color: #1c746c; }
 .score-stepper.score-5 { border-color: #91c3a5; background: #eff9f3; }.score-stepper.score-5 input { color: #287347; }
-.weighted-result { width: 102px; min-height: 60px; margin: auto; padding: 7px 9px; display: grid; gap: 4px; place-items: center; border: 1px solid color-mix(in srgb, var(--behavior-color) 42%, #fff); border-radius: 11px; color: var(--behavior-color); background: color-mix(in srgb, var(--behavior-color) 8%, #fff); transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease; }
+.weighted-result { width: 102px; min-height: 60px; margin: auto; padding: 7px 9px; display: grid; gap: 4px; place-items: center; border: 1px solid var(--behavior-color); border-radius: 11px; color: #fff; background: var(--behavior-color); box-shadow: 0 5px 12px color-mix(in srgb, var(--behavior-color) 24%, transparent); transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
 .weighted-result > strong { color: inherit; font-size: 13px; line-height: 1; }
-.weighted-result > i { width: 68px; height: 4px; overflow: hidden; border-radius: 20px; background: #dfe6ec; }
-.weighted-result > i > i { display: block; height: 100%; border-radius: inherit; background: var(--behavior-color); transition: width .3s ease; }
+.weighted-result > i { width: 68px; height: 4px; overflow: hidden; border-radius: 20px; background: rgba(255,255,255,.28); }
+.weighted-result > i > i { display: block; height: 100%; border-radius: inherit; background: #fff; transition: width .3s ease; }
 .weighted-result > small { margin: 0; color: inherit; font-size: 7px; font-weight: 800; line-height: 1; text-align: center; }
-.behavior-table .table-row:hover .weighted-result { transform: translateY(-1px); }
+.behavior-table .table-row:hover .weighted-result { transform: translateY(-1px); box-shadow: 0 7px 16px color-mix(in srgb, var(--behavior-color) 32%, transparent); }
 
 .feedback-grid { margin-bottom: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .feedback-card { min-height: 260px; padding: 20px; border: 1px solid var(--line); border-top: 4px solid; border-radius: 14px; background: #fff; display: flex; flex-direction: column; }
