@@ -128,8 +128,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
 .table-row > span { text-align: center; font-size: 10px; }
 .table-row input { width: calc(100% - 14px); height: 37px; }
 .metric { color: var(--navy); font-weight: 700; }
-.rating { width: 31px; height: 31px; margin: auto; display: grid; place-items: center; border-radius: 50%; color: var(--navy); background: #edf2f6; font-weight: 800; }
-.rating-1 { color: #a63838; background: #fde9e7; }.rating-2 { color: #9b651c; background: #fff1d7; }.rating-3 { color: #395c7c; background: #e9f1f8; }.rating-4 { color: #176b66; background: #def3ef; }.rating-5 { color: #236a44; background: #dff2e6; }
+.rating { width: 31px; height: 31px; margin: auto; display: grid; place-items: center; border-radius: 50%; color: #fff; background: #6b7785; font-weight: 800; }
+.rating-1 { background: #c43d3d; }.rating-2 { background: #c47a1b; }.rating-3 { background: #3f6f9b; }.rating-4 { background: #247c74; }.rating-5 { background: #2f7d4f; }
 
 .source-strip { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
 .source-strip span { padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--muted); font-size: 10px; }
