@@ -66,6 +66,15 @@ function kpiRating(actual: string, target: string) {
   return 5;
 }
 
+function kpiStatus(rating: number) {
+  if (rating === 1) return "Crítico";
+  if (rating === 2) return "En desarrollo";
+  if (rating === 3) return "Cerca de la meta";
+  if (rating === 4) return "Meta alcanzada";
+  if (rating === 5) return "Sobrecumple";
+  return "Pendiente";
+}
+
 function weightedScore(row: ScoreRow) {
   const entries = (Object.keys(sourceWeights) as (keyof ScoreRow)[])
     .filter((key) => row[key] !== "")
@@ -143,6 +152,10 @@ export default function Home() {
     const total = kpiPoints + competencePoints + attitudePoints + valuePoints;
     return { kpiRatings, behaviorScores, kpiPoints, competencePoints, attitudePoints, valuePoints, kpiDone, behaviorDone, completeness, complete, total };
   }, [kpis, scores]);
+
+  const kpiAverage = results.kpiDone
+    ? results.kpiRatings.reduce((sum, rating) => sum + rating, 0) / results.kpiDone
+    : 0;
 
   const localOutput = useMemo(() => ({
     formatVersion: 1,
@@ -495,14 +508,10 @@ export default function Home() {
                 <span>Indicadores completos</span>
                 <strong>{results.kpiDone}<small>/7</small></strong>
               </div>
-              <div className="kpi-overview-stat">
+              <div className={`kpi-overview-stat kpi-average average-${Math.round(kpiAverage)}`}>
                 <span>Promedio de nota</span>
-                <strong>
-                  {results.kpiDone
-                    ? (results.kpiRatings.reduce((sum, rating) => sum + rating, 0) / results.kpiDone).toFixed(1)
-                    : "—"}
-                  <small>/5</small>
-                </strong>
+                <strong>{kpiAverage ? kpiAverage.toFixed(1) : "—"}<small>/5</small></strong>
+                <em>{kpiStatus(Math.round(kpiAverage))}</em>
               </div>
               <div className="kpi-weight">
                 <strong>30%</strong>
@@ -521,8 +530,10 @@ export default function Home() {
                 <div className="table-head"><span>Indicador</span><span>Peso</span><span>Resultado</span><span>Meta</span><span>Cumplimiento</span><span>Nota</span></div>
                 {kpiDefinitions.map((item, index) => {
                   const ratio = Number(kpis[index].target) > 0 ? Number(kpis[index].actual) / Number(kpis[index].target) : 0;
+                  const rating = results.kpiRatings[index];
+                  const status = kpiStatus(rating);
                   return (
-                    <div className={`table-row ${results.kpiRatings[index] ? "is-complete" : ""}`} key={item.code}>
+                    <div className={`table-row rating-tone-${rating}`} key={item.code}>
                       <div><b>{item.code}</b><strong>{item.name}</strong><small>{item.description}</small></div>
                       <span>{Math.round(item.weight * 100)}%</span>
                       <div className="number-stepper actual">
@@ -557,11 +568,15 @@ export default function Home() {
                         />
                         <button type="button" aria-label={`Aumentar meta de ${item.name}`} onClick={() => adjustKpi(index, "target", 1)}>+</button>
                       </div>
-                      <span className="metric">
+                      <span className={`metric metric-${rating}`} aria-label={ratio ? `${(ratio * 100).toFixed(1)} por ciento, ${status}` : status}>
                         <strong>{ratio ? `${(ratio * 100).toFixed(1)}%` : "—"}</strong>
-                        <i className="metric-track"><i style={{ width: `${Math.min(ratio * 100, 100)}%` }} /></i>
+                        <i className="metric-track">
+                          <i style={{ width: `${Math.min((ratio / 1.1) * 100, 100)}%` }} />
+                          <em className="metric-target" />
+                        </i>
+                        <small className="metric-status">{status}</small>
                       </span>
-                      <span className={`rating rating-${results.kpiRatings[index] || 0}`}>{results.kpiRatings[index] || "—"}</span>
+                      <span className={`rating rating-${rating || 0}`} aria-label={`Nota ${rating || "pendiente"}`}>{rating || "—"}</span>
                     </div>
                   );
                 })}
