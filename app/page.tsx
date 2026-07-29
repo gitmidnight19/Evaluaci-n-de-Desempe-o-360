@@ -336,11 +336,26 @@ export default function Home() {
           <span className="brand-product">TAT 360 · Gestión del desempeño</span>
         </div>
 
-        <div className="cycle-card">
-          <span className="eyebrow">Ciclo activo</span>
-          <strong>{profile.period || "Periodo sin definir"}</strong>
-          <div className="progress-track"><span style={{ width: `${results.completeness}%` }} /></div>
-          <small>{results.completeness}% completado</small>
+        <div className={`cycle-card ${results.completeness === 100 ? "complete" : ""}`}>
+          <div className="cycle-card-head">
+            <span><i />Ciclo activo</span>
+            <strong>{results.completeness}%</strong>
+          </div>
+          <p>{profile.period || "Periodo sin definir"}</p>
+          <div className="cycle-progress-label">
+            <span>Avance de evaluación</span>
+            <small>{results.completeness}% completado</small>
+          </div>
+          <div className="progress-track" role="progressbar" aria-label="Progreso del ciclo" aria-valuemin={0} aria-valuemax={100} aria-valuenow={results.completeness}>
+            <span style={{ width: `${results.completeness}%` }} />
+          </div>
+          <div className="cycle-card-status">
+            <i>{results.completeness === 100 ? "✓" : "↗"}</i>
+            <div>
+              <strong>{results.completeness === 100 ? "Evaluación completa" : "Evaluación en curso"}</strong>
+              <small>{results.completeness === 100 ? "Todos los bloques diligenciados" : `${21 - results.kpiDone - results.behaviorDone} registros pendientes`}</small>
+            </div>
+          </div>
         </div>
 
         <nav aria-label="Secciones de la evaluación">
