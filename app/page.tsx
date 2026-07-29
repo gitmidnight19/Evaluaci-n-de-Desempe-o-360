@@ -333,7 +333,6 @@ export default function Home() {
             width={500}
             height={500}
           />
-          <span className="brand-product">TAT 360 · Gestión del desempeño</span>
         </div>
 
         <div className={`cycle-card ${results.completeness === 100 ? "complete" : ""}`}>
@@ -347,7 +346,7 @@ export default function Home() {
           </div>
           <div className="cycle-card-footer">
             <span>{results.completeness === 100 ? "Ciclo completado" : `${results.kpiDone + results.behaviorDone} de 21 registros`}</span>
-            <small>{results.completeness === 100 ? "✓" : `${21 - results.kpiDone - results.behaviorDone} pendientes`}</small>
+            <small>{results.completeness === 100 ? "Finalizado" : `${21 - results.kpiDone - results.behaviorDone} pendientes`}</small>
           </div>
         </div>
 
@@ -360,16 +359,6 @@ export default function Home() {
           ))}
         </nav>
 
-        <div className={`sidebar-note save-${saveState}`} aria-live="polite">
-          <span className="status-dot" />
-          {saveState === "saving"
-            ? "Guardando evaluación…"
-            : saveState === "saved"
-              ? "Evaluación guardada"
-              : saveState === "error"
-                ? "Error al guardar"
-                : "Cambios pendientes de guardar"}
-        </div>
       </aside>
 
       <section className="workspace">
