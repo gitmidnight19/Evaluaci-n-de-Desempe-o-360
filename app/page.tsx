@@ -214,6 +214,21 @@ export default function Home() {
     setScores((current) => current.map((row, i) => i === index ? { ...row, [source]: value } : row));
   };
 
+  const setScore = (index: number, source: keyof ScoreRow, value: string) => {
+    if (value === "") {
+      updateScore(index, source, "");
+      return;
+    }
+    const nextValue = Math.min(5, Math.max(1, Math.round(Number(value))));
+    if (Number.isFinite(nextValue)) updateScore(index, source, String(nextValue));
+  };
+
+  const adjustScore = (index: number, source: keyof ScoreRow, amount: number) => {
+    const currentValue = Number(scores[index][source]) || 0;
+    const nextValue = currentValue === 0 ? 1 : Math.min(5, Math.max(1, currentValue + amount));
+    updateScore(index, source, String(nextValue));
+  };
+
   const saveEvaluation = async () => {
     if (saveState === "saving") return false;
     const versionBeingSaved = dataVersion.current;
@@ -588,11 +603,38 @@ export default function Home() {
                   {behaviorDefinitions.map((item, index) => item.block === block && (
                     <div className="table-row" key={item.code}>
                       <div><b>{item.code}</b><strong>{item.name}</strong><small>{item.behavior}</small></div>
-                      {(["auto", "jefe", "pares", "clientes"] as (keyof ScoreRow)[]).map((source) => (
-                        <select key={source} aria-label={`${item.name} ${source}`} value={scores[index][source]} onChange={(e) => updateScore(index, source, e.target.value)}>
-                          <option value="">—</option>{[1, 2, 3, 4, 5].map((n) => <option value={n} key={n}>{n}</option>)}
-                        </select>
-                      ))}
+                      {(["auto", "jefe", "pares", "clientes"] as (keyof ScoreRow)[]).map((source) => {
+                        const score = scores[index][source];
+                        return (
+                          <div className={`score-stepper score-${score || 0}`} key={source}>
+                            <button
+                              type="button"
+                              aria-label={`Disminuir nota de ${item.name}, ${source}`}
+                              disabled={!score || Number(score) <= 1}
+                              onClick={() => adjustScore(index, source, -1)}
+                            >−</button>
+                            <input
+                              aria-label={`${item.name} ${source}`}
+                              type="number"
+                              inputMode="numeric"
+                              min="1"
+                              max="5"
+                              step="1"
+                              placeholder="—"
+                              value={score}
+                              onFocus={(event) => event.currentTarget.select()}
+                              onWheel={(event) => event.currentTarget.blur()}
+                              onChange={(event) => setScore(index, source, event.target.value)}
+                            />
+                            <button
+                              type="button"
+                              aria-label={`Aumentar nota de ${item.name}, ${source}`}
+                              disabled={Number(score) >= 5}
+                              onClick={() => adjustScore(index, source, 1)}
+                            >+</button>
+                          </div>
+                        );
+                      })}
                       <span className="weighted-result">{results.behaviorScores[index] ? results.behaviorScores[index].toFixed(2) : "—"}</span>
                     </div>
                   ))}

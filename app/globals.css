@@ -178,9 +178,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
 .source { width: 21px; height: 21px; margin-right: 7px; display: inline-grid; place-items: center; border-radius: 6px; color: #fff; font-style: normal; font-size: 9px; font-weight: 800; }
 .source.auto { background: #6b7f93; }.source.boss { background: var(--blue); }.source.peer { background: var(--teal); }.source.client { background: var(--gold); }
 .behavior-section { margin-bottom: 16px; }
-.behavior-table .table-head, .behavior-table .table-row { grid-template-columns: minmax(360px, 1.8fr) repeat(4, 75px) 80px; }
+.behavior-table { min-width: 930px; }
+.behavior-table .table-head, .behavior-table .table-row { grid-template-columns: minmax(360px, 1.8fr) repeat(4, 92px) 80px; }
 .behavior-table .table-row { min-height: 87px; }
-.behavior-table select { width: 58px; margin: auto; }
+.score-stepper { width: 78px; height: 37px; margin: auto; display: grid; grid-template-columns: 23px 32px 23px; align-items: center; overflow: hidden; border: 1px solid #d6dee6; border-radius: 10px; background: #f7f9fb; transition: border-color .15s, box-shadow .15s, background .15s; }
+.score-stepper:focus-within { border-color: #8f2a37; background: #fff; box-shadow: 0 0 0 3px rgba(143,42,55,.1); }
+.score-stepper input { width: 32px; height: 35px; padding: 0; border: 0; border-radius: 0; background: transparent; color: #6f7d8d; text-align: center; font-size: 12px; font-weight: 800; appearance: textfield; }
+.score-stepper input:focus { border: 0; background: transparent; box-shadow: none; }
+.score-stepper input::-webkit-inner-spin-button, .score-stepper input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.score-stepper button { width: 23px; height: 35px; padding: 0; border: 0; color: #758393; background: transparent; font-size: 14px; font-weight: 800; line-height: 1; transition: color .15s, background .15s, transform .1s; }
+.score-stepper button:hover:not(:disabled) { color: #fff; background: #8f2a37; }
+.score-stepper button:active:not(:disabled) { transform: scale(.86); }
+.score-stepper button:disabled { cursor: default; opacity: .25; }
+.score-stepper button:focus-visible { outline: 2px solid #8f2a37; outline-offset: -2px; }
+.score-stepper.score-1 { border-color: #dfa5a5; background: #fff4f3; }.score-stepper.score-1 input { color: #b52f2f; }
+.score-stepper.score-2 { border-color: #e5c18d; background: #fff8eb; }.score-stepper.score-2 input { color: #a86413; }
+.score-stepper.score-3 { border-color: #a9c3da; background: #f2f7fb; }.score-stepper.score-3 input { color: #35658f; }
+.score-stepper.score-4 { border-color: #90c9c3; background: #eff9f7; }.score-stepper.score-4 input { color: #1c746c; }
+.score-stepper.score-5 { border-color: #91c3a5; background: #eff9f3; }.score-stepper.score-5 input { color: #287347; }
 .weighted-result { width: 42px; height: 30px; margin: auto; display: grid; place-items: center; border-radius: 8px; color: var(--navy); background: #f6e9eb; font-weight: 800; }
 
 .feedback-grid { margin-bottom: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
