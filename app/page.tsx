@@ -423,7 +423,7 @@ export default function Home() {
             <section className="panel">
               <div className="panel-heading">
                 <div><span className="eyebrow">Aporte ponderado</span><h3>Resultado por bloque</h3></div>
-                <span className="legend">Puntaje sobre 100</span>
+                <span className="block-total"><strong>{results.total.toFixed(1)}</strong>/100</span>
               </div>
               <div className="block-results">
                 {[
@@ -431,12 +431,21 @@ export default function Home() {
                   ["Competencias", results.competencePoints, 30, "teal"],
                   ["Longitudinal / actitudinal", results.attitudePoints, 30, "gold"],
                   ["Valores corporativos", results.valuePoints, 10, "green"],
-                ].map(([label, value, max, color]) => (
-                  <div className="result-row" key={String(label)}>
-                    <div><strong>{label}</strong><span>{Number(value).toFixed(1)} de {max}</span></div>
-                    <div className="result-track"><span className={String(color)} style={{ width: `${Math.min(100, (Number(value) / Number(max)) * 100)}%` }} /></div>
-                  </div>
-                ))}
+                ].map(([label, value, max, color]) => {
+                  const percentage = Math.min(100, (Number(value) / Number(max)) * 100);
+                  return (
+                    <article className={`block-result-card ${color}`} key={String(label)}>
+                      <div className="block-ring" style={{ background: `conic-gradient(var(--block-color) ${percentage * 3.6}deg, #e9eef2 0deg)` }}>
+                        <div><strong>{Number(value).toFixed(1)}</strong><small>/{max}</small></div>
+                      </div>
+                      <div className="block-result-copy">
+                        <span>{label}</span>
+                        <strong>{percentage.toFixed(0)}%</strong>
+                        <small>del aporte disponible</small>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </section>
 
