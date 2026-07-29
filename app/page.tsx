@@ -461,26 +461,76 @@ export default function Home() {
         {view === "kpis" && (
           <div className="page-content">
             <PageTitle number="03" title="KPIs de resultados" subtitle="Registre resultado y meta con base en fuentes oficiales del sistema comercial." />
-            <div className="weight-banner"><strong>30%</strong><span>Peso de resultados cuantitativos en la evaluación final</span><em>{results.kpiDone}/7 completos</em></div>
+            <section className="kpi-overview">
+              <div className="kpi-overview-score">
+                <span className="eyebrow">Aporte a la evaluación</span>
+                <div><strong>{results.kpiPoints.toFixed(1)}</strong><span>/ 30 puntos</span></div>
+                <div className="kpi-progress" aria-label={`${results.kpiDone} de 7 indicadores completos`}>
+                  <i style={{ width: `${(results.kpiDone / 7) * 100}%` }} />
+                </div>
+                <small>{results.kpiDone === 7 ? "Bloque completo" : `${7 - results.kpiDone} indicadores pendientes`}</small>
+              </div>
+              <div className="kpi-overview-stat">
+                <span>Indicadores completos</span>
+                <strong>{results.kpiDone}<small>/7</small></strong>
+              </div>
+              <div className="kpi-overview-stat">
+                <span>Promedio de nota</span>
+                <strong>
+                  {results.kpiDone
+                    ? (results.kpiRatings.reduce((sum, rating) => sum + rating, 0) / results.kpiDone).toFixed(1)
+                    : "—"}
+                  <small>/5</small>
+                </strong>
+              </div>
+              <div className="kpi-weight">
+                <strong>30%</strong>
+                <span>Peso en la evaluación final</span>
+              </div>
+            </section>
             <section className="panel table-panel">
+              <div className="kpi-table-heading">
+                <div>
+                  <span className="eyebrow">Resultados comerciales</span>
+                  <h3>Indicadores del periodo</h3>
+                </div>
+                <span>La nota se calcula automáticamente</span>
+              </div>
               <div className="data-table kpi-table">
                 <div className="table-head"><span>Indicador</span><span>Peso</span><span>Resultado</span><span>Meta</span><span>Cumplimiento</span><span>Nota</span></div>
                 {kpiDefinitions.map((item, index) => {
                   const ratio = Number(kpis[index].target) > 0 ? Number(kpis[index].actual) / Number(kpis[index].target) : 0;
                   return (
-                    <div className="table-row" key={item.code}>
+                    <div className={`table-row ${results.kpiRatings[index] ? "is-complete" : ""}`} key={item.code}>
                       <div><b>{item.code}</b><strong>{item.name}</strong><small>{item.description}</small></div>
                       <span>{Math.round(item.weight * 100)}%</span>
                       <input aria-label={`${item.name} resultado`} type="number" min="0" value={kpis[index].actual} onChange={(e) => updateKpi(index, "actual", e.target.value)} />
                       <input aria-label={`${item.name} meta`} type="number" min="0" value={kpis[index].target} onChange={(e) => updateKpi(index, "target", e.target.value)} />
-                      <span className="metric">{ratio ? `${(ratio * 100).toFixed(1)}%` : "—"}</span>
+                      <span className="metric">
+                        <strong>{ratio ? `${(ratio * 100).toFixed(1)}%` : "—"}</strong>
+                        <i className="metric-track"><i style={{ width: `${Math.min(ratio * 100, 100)}%` }} /></i>
+                      </span>
                       <span className={`rating rating-${results.kpiRatings[index] || 0}`}>{results.kpiRatings[index] || "—"}</span>
                     </div>
                   );
                 })}
               </div>
             </section>
-            <InfoBanner title="Escala automática">Menos de 70% = 1 · 70–84,9% = 2 · 85–99,9% = 3 · 100–109,9% = 4 · 110% o más = 5.</InfoBanner>
+            <div className="rating-scale" aria-label="Escala automática de calificación">
+              <div><strong>Escala automática</strong><span>Basada en el porcentaje de cumplimiento</span></div>
+              {[
+                ["1", "< 70%"],
+                ["2", "70–84,9%"],
+                ["3", "85–99,9%"],
+                ["4", "100–109,9%"],
+                ["5", "≥ 110%"],
+              ].map(([rating, range]) => (
+                <span className="rating-scale-item" key={rating}>
+                  <i className={`rating rating-${rating}`}>{rating}</i>
+                  <small>{range}</small>
+                </span>
+              ))}
+            </div>
             <FooterActions onSaveAndNext={async () => { if (await saveEvaluation()) goNext(); }} saveState={saveState} />
           </div>
         )}
