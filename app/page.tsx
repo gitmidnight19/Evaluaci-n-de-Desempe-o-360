@@ -203,6 +203,12 @@ export default function Home() {
     setKpis((current) => current.map((row, i) => i === index ? { ...row, [field]: value } : row));
   };
 
+  const adjustKpi = (index: number, field: "actual" | "target", amount: number) => {
+    const currentValue = Number(kpis[index][field]) || 0;
+    const nextValue = Math.max(0, Number((currentValue + amount).toFixed(2)));
+    updateKpi(index, field, String(nextValue));
+  };
+
   const updateScore = (index: number, source: keyof ScoreRow, value: string) => {
     markDirty();
     setScores((current) => current.map((row, i) => i === index ? { ...row, [source]: value } : row));
@@ -504,8 +510,38 @@ export default function Home() {
                     <div className={`table-row ${results.kpiRatings[index] ? "is-complete" : ""}`} key={item.code}>
                       <div><b>{item.code}</b><strong>{item.name}</strong><small>{item.description}</small></div>
                       <span>{Math.round(item.weight * 100)}%</span>
-                      <input aria-label={`${item.name} resultado`} type="number" min="0" value={kpis[index].actual} onChange={(e) => updateKpi(index, "actual", e.target.value)} />
-                      <input aria-label={`${item.name} meta`} type="number" min="0" value={kpis[index].target} onChange={(e) => updateKpi(index, "target", e.target.value)} />
+                      <div className="number-stepper actual">
+                        <button type="button" aria-label={`Disminuir resultado de ${item.name}`} onClick={() => adjustKpi(index, "actual", -1)}>−</button>
+                        <input
+                          aria-label={`${item.name} resultado`}
+                          type="number"
+                          inputMode="decimal"
+                          min="0"
+                          step="any"
+                          placeholder="0"
+                          value={kpis[index].actual}
+                          onFocus={(event) => event.currentTarget.select()}
+                          onWheel={(event) => event.currentTarget.blur()}
+                          onChange={(e) => updateKpi(index, "actual", e.target.value)}
+                        />
+                        <button type="button" aria-label={`Aumentar resultado de ${item.name}`} onClick={() => adjustKpi(index, "actual", 1)}>+</button>
+                      </div>
+                      <div className="number-stepper target">
+                        <button type="button" aria-label={`Disminuir meta de ${item.name}`} onClick={() => adjustKpi(index, "target", -1)}>−</button>
+                        <input
+                          aria-label={`${item.name} meta`}
+                          type="number"
+                          inputMode="decimal"
+                          min="0"
+                          step="any"
+                          placeholder="0"
+                          value={kpis[index].target}
+                          onFocus={(event) => event.currentTarget.select()}
+                          onWheel={(event) => event.currentTarget.blur()}
+                          onChange={(e) => updateKpi(index, "target", e.target.value)}
+                        />
+                        <button type="button" aria-label={`Aumentar meta de ${item.name}`} onClick={() => adjustKpi(index, "target", 1)}>+</button>
+                      </div>
                       <span className="metric">
                         <strong>{ratio ? `${(ratio * 100).toFixed(1)}%` : "—"}</strong>
                         <i className="metric-track"><i style={{ width: `${Math.min(ratio * 100, 100)}%` }} /></i>
