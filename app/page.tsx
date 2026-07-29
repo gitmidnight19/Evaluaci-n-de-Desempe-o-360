@@ -384,7 +384,7 @@ export default function Home() {
                 <h2>{profile.name ? `Desempeño de ${profile.name}` : "Una lectura integral del desempeño en calle"}</h2>
                 <p>Resultados comerciales, ejecución TAT, adaptación operativa y valores corporativos en una sola vista.</p>
               </div>
-              <div className={`score-orb ${results.complete ? "" : "pending"}`}>
+              <div className={`score-orb ${results.complete ? `tone-${scoreTone(results.total)}` : "pending"}`}>
                 <span>{results.complete ? results.total.toFixed(1) : "—"}</span>
                 <small>{results.complete ? category(results.total) : "Resultado pendiente"}</small>
               </div>
