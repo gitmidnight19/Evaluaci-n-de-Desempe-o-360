@@ -101,6 +101,15 @@ function category(score: number) {
   return "Crítico";
 }
 
+function scoreTone(score: number) {
+  if (score <= 0) return "pending";
+  if (score >= 90) return "outstanding";
+  if (score >= 80) return "highlighted";
+  if (score >= 60) return "expected";
+  if (score >= 40) return "low";
+  return "critical";
+}
+
 export default function Home() {
   const [view, setView] = useState<View>("resumen");
   const [profile, setProfile] = useState({
@@ -411,21 +420,23 @@ export default function Home() {
               </div>
               <div className="block-results">
                 {[
-                  ["KPIs de resultados", results.kpiPoints, 30, "blue"],
-                  ["Competencias", results.competencePoints, 30, "teal"],
-                  ["Longitudinal / actitudinal", results.attitudePoints, 30, "gold"],
-                  ["Valores corporativos", results.valuePoints, 10, "green"],
-                ].map(([label, value, max, color]) => {
+                  ["KPIs de resultados", results.kpiPoints, 30],
+                  ["Competencias", results.competencePoints, 30],
+                  ["Longitudinal / actitudinal", results.attitudePoints, 30],
+                  ["Valores corporativos", results.valuePoints, 10],
+                ].map(([label, value, max]) => {
                   const percentage = Math.min(100, (Number(value) / Number(max)) * 100);
+                  const tone = scoreTone(percentage);
+                  const status = percentage > 0 ? category(percentage) : "Pendiente";
                   return (
-                    <article className={`block-result-card ${color}`} key={String(label)}>
+                    <article className={`block-result-card tone-${tone}`} key={String(label)}>
                       <div className="block-ring" style={{ background: `conic-gradient(var(--block-color) ${percentage * 3.6}deg, #e9eef2 0deg)` }}>
                         <div><strong>{Number(value).toFixed(1)}</strong><small>/{max}</small></div>
                       </div>
                       <div className="block-result-copy">
                         <span>{label}</span>
                         <strong>{percentage.toFixed(0)}%</strong>
-                        <small>del aporte disponible</small>
+                        <small>{status}</small>
                       </div>
                     </article>
                   );

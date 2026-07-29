@@ -81,9 +81,9 @@ button { cursor: pointer; }
 .legend { color: var(--muted); font-size: 10px; }
 .block-total { display: flex; align-items: baseline; gap: 3px; color: var(--muted); font-size: 10px; }.block-total strong { color: var(--navy); font-size: 20px; }
 .block-results { padding: 20px 22px 22px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
-.block-result-card { --block-color: #a23846; min-width: 0; padding: 19px 16px; border: 1px solid var(--line); border-radius: 15px; background: #fff; display: flex; align-items: center; gap: 14px; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.block-result-card { --block-color: #8996a3; min-width: 0; padding: 19px 16px; border: 1px solid var(--line); border-radius: 15px; background: #fff; display: flex; align-items: center; gap: 14px; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
 .block-result-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--block-color) 35%, #fff); box-shadow: 0 10px 24px color-mix(in srgb, var(--block-color) 12%, transparent); }
-.block-result-card.blue { --block-color: #b52f3e; }.block-result-card.teal { --block-color: #247c74; }.block-result-card.gold { --block-color: #c18725; }.block-result-card.green { --block-color: #2f7d4f; }
+.block-result-card.tone-critical { --block-color: #c43d3d; }.block-result-card.tone-low { --block-color: #c47a1b; }.block-result-card.tone-expected { --block-color: #3f6f9b; }.block-result-card.tone-highlighted { --block-color: #247c74; }.block-result-card.tone-outstanding { --block-color: #2f7d4f; }
 .block-ring { position: relative; width: 72px; height: 72px; flex: 0 0 auto; border-radius: 50%; display: grid; place-items: center; transition: background .3s ease; }
 .block-ring::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 1px #edf1f4; }
 .block-ring > div { position: relative; z-index: 1; display: flex; align-items: baseline; }
