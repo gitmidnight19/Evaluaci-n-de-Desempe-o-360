@@ -26,17 +26,17 @@ button { cursor: pointer; }
 .sidebar::-webkit-scrollbar { width: 5px; }.sidebar::-webkit-scrollbar-thumb { border-radius: 10px; background: rgba(255,255,255,.18); }
 .brand { display: flex; flex-direction: column; align-items: flex-start; padding: 2px 8px 16px; border-bottom: 1px solid rgba(255,255,255,.09); }
 .brand-logo { width: 142px; height: auto; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,.16)); }
-.cycle-card { margin: 16px 0 18px; padding: 14px; border: 1px solid #7d2a38; border-radius: 13px; background: #651b28; box-shadow: 0 9px 20px rgba(17,3,6,.2); }
+.cycle-card { margin: 16px 0 18px; padding: 14px; border: 1px solid #e24a4a; border-radius: 13px; background: #c62828; box-shadow: 0 9px 20px rgba(57,4,4,.24); }
 .cycle-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.cycle-card-head > span { display: inline-flex; align-items: center; gap: 6px; color: #cba7ad; font-size: 7px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+.cycle-card-head > span { display: inline-flex; align-items: center; gap: 6px; color: #ffe1e1; font-size: 7px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
 .cycle-card-head > span i { width: 6px; height: 6px; border-radius: 50%; background: #64d7a1; box-shadow: 0 0 0 3px rgba(100,215,161,.11); }
 .cycle-card-head > strong { margin: 0; color: #fff; font-size: 11px; }
 .cycle-card > p { margin: 11px 0 12px; overflow: hidden; color: #fff; font-size: 13px; font-weight: 800; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .progress-track { height: 5px; overflow: hidden; margin-bottom: 9px; border-radius: 20px; background: rgba(255,255,255,.11); }
-.progress-track span { display: block; height: 100%; border-radius: inherit; background: #e64a55; transition: width .35s ease; }
+.progress-track span { display: block; height: 100%; border-radius: inherit; background: #fff; transition: width .35s ease; }
 .cycle-card.complete .progress-track span { background: #50c88e; }
 .cycle-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.cycle-card-footer span { color: #cfaab0; font-size: 7px; font-weight: 700; }
+.cycle-card-footer span { color: #ffe1e1; font-size: 7px; font-weight: 700; }
 .cycle-card-footer small { color: #fff; font-size: 7px; font-weight: 800; }
 .cycle-card.complete .cycle-card-footer small { color: #62d8a0; }
 .nav-label { margin: 0 10px 7px; color: #8f6870; font-size: 7px; font-weight: 800; text-transform: uppercase; letter-spacing: .13em; }
