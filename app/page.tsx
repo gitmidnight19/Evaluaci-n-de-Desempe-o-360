@@ -362,21 +362,6 @@ export default function Home() {
       </aside>
 
       <section className="workspace">
-        <header className="topbar">
-          <div>
-            <span className="eyebrow">Evaluación de desempeño 360°</span>
-            <h1>Asesor Comercial TAT</h1>
-          </div>
-          <div className="top-actions">
-            <button className="button ghost" onClick={reset}>Nueva evaluación</button>
-            <button className="button primary" onClick={saveEvaluation} disabled={saveState === "saving"}>
-              {saveState === "saving" ? "Guardando…" : "Guardar evaluación"}
-            </button>
-            <button className="button ghost" onClick={downloadPdfOutput}>Descargar PDF</button>
-            <button className="button primary" onClick={() => window.print()}>Imprimir informe</button>
-          </div>
-        </header>
-
         {saveMessage && (
           <div className={`save-notice ${saveState}`} role={saveState === "error" ? "alert" : "status"}>
             {saveMessage}
@@ -456,6 +441,12 @@ export default function Home() {
               </div>
               <button className="button dark" onClick={() => setView(!profile.name ? "ficha" : results.kpiDone < 7 ? "kpis" : results.behaviorDone < 14 ? "evaluacion" : "feedback")}>Continuar →</button>
             </section>
+            <div className="section-actions">
+              <button className="button ghost" onClick={reset}>Nueva evaluación</button>
+              <button className="button primary" onClick={saveEvaluation} disabled={saveState === "saving"}>
+                {saveState === "saving" ? "Guardando…" : "Guardar evaluación"}
+              </button>
+            </div>
           </div>
         )}
 
@@ -755,7 +746,13 @@ export default function Home() {
                   <span><i style={{ width: `${results.completeness}%` }} /></span>
                   <small>{results.kpiDone + results.behaviorDone} de 21 criterios diligenciados</small>
                 </div>
-                <button className="button completion-download" onClick={downloadPdfOutput}>Descargar informe PDF</button>
+                <div className="completion-actions">
+                  <button className="button completion-save" onClick={saveEvaluation} disabled={saveState === "saving"}>
+                    {saveState === "saving" ? "Guardando…" : "Guardar cierre"}
+                  </button>
+                  <button className="button completion-download" onClick={downloadPdfOutput}>Descargar PDF</button>
+                  <button className="button completion-print" onClick={() => window.print()}>Imprimir</button>
+                </div>
               </div>
             </section>
           </div>
