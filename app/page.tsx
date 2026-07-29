@@ -381,7 +381,13 @@ export default function Home() {
           <div className="page-content">
             <section className="hero">
               <div>
-                <h2>{profile.name ? `Desempeño de ${profile.name}` : "Una lectura integral del desempeño en calle"}</h2>
+                <h2>
+                  {profile.name ? (
+                    <>Desempeño de <strong className="executive-person-name">{profile.name}</strong></>
+                  ) : (
+                    "Una lectura integral del desempeño en calle"
+                  )}
+                </h2>
                 <p>Resultados comerciales, ejecución TAT, adaptación operativa y valores corporativos en una sola vista.</p>
               </div>
               <div className={`score-orb ${results.complete ? `tone-${scoreTone(results.total)}` : "pending"}`}>
